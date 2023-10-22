@@ -23,7 +23,7 @@ frame-support = { version = "22.0.0", default-features = false }
 pallet-insecure-randomness-collective-flip = { version = "10.0.0", default-features = false }
 pallet-sudo = { version = "22.0.0", default-features = false }
 frame-system = { version = "22.0.0", default-features = false }
-pallet-timestamp = { version = "21.0.0", default-features = false }
+pallet-timestamp = { path = "../timestamp", default-features = false }
 pallet-transaction-payment = { version = "22.0.0", default-features = false }
 frame-executive = { version = "22.0.0", default-features = false }
 sp-api = { version = "20.0.0", default-features = false }
