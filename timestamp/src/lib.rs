@@ -247,15 +247,28 @@ pub mod pallet {
 			ensure_none(origin)?;
 			assert!(!DidUpdate::<T>::exists(), "Timestamp must be updated only once in the block");
 			let prev = Self::now();
-			assert!(
-				prev.is_zero() || now >= prev + T::MinimumPeriod::get(),
-				"Timestamp must increment by at least <MinimumPeriod> between sequential blocks"
-			);
-			Now::<T>::put(now);
+			// assert!(
+			// 	prev.is_zero() || now >= prev + T::MinimumPeriod::get(),
+			// 	"Timestamp must increment by at least <MinimumPeriod> between sequential blocks"
+			// );
+			// Now::<T>::put(now);
 			DidUpdate::<T>::put(true);
 
-			<T::OnTimestampSet as OnTimestampSet<_>>::on_timestamp_set(now);
+			<T::OnTimestampSet as OnTimestampSet<_>>::on_timestamp_set(prev);
 
+			Ok(())
+		}
+
+		#[pallet::call_index(1)]
+		#[pallet::weight((
+			T::WeightInfo::set(),
+			DispatchClass::Mandatory
+		))]
+		pub fn set_manually(
+			origin: OriginFor<T>,
+			#[pallet::compact] now: T::Moment,
+		) -> DispatchResult {
+			Now::<T>::put(now);
 			Ok(())
 		}
 	}
