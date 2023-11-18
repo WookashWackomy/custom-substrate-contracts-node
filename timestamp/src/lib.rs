@@ -1,3 +1,5 @@
+//The following content was taken straight from https://github.dev/paritytech/polkadot-sdk/tree/master/substrate/frame/timestamp and not modified
+
 // This file is part of Substrate.
 
 // Copyright (C) Parity Technologies (UK) Ltd.
@@ -145,6 +147,23 @@ use sp_timestamp::{InherentError, InherentType, INHERENT_IDENTIFIER};
 pub use weights::WeightInfo;
 extern crate frame_system;
 
+use codec::{Decode, Encode};
+use frame_support::{
+	dispatch::{ClassifyDispatch, DispatchClass, DispatchResult, Pays, PaysFee, WeighData},
+	traits::IsSubType,
+	weights::Weight,
+};
+use frame_system::ensure_signed;
+use log::info;
+use scale_info::TypeInfo;
+use sp_runtime::{
+	traits::{Bounded, DispatchInfoOf, SaturatedConversion, Saturating, SignedExtension},
+	transaction_validity::{
+		InvalidTransaction, TransactionValidity, TransactionValidityError, ValidTransaction,
+	},
+};
+use sp_std::{marker::PhantomData, prelude::*};
+
 pub use pallet::*;
 
 #[frame_support::pallet]
@@ -189,6 +208,10 @@ pub mod pallet {
 	#[pallet::storage]
 	#[pallet::getter(fn now)]
 	pub type Now<T: Config> = StorageValue<_, T::Moment, ValueQuery>;
+
+	#[pallet::storage]
+	#[pallet::getter(fn manual)]
+	pub(super) type Manual<T: Config> = StorageValue<_, T::bool, ValueQuery>;
 
 	/// Whether the timestamp has been updated in this block.
 	///
@@ -246,15 +269,22 @@ pub mod pallet {
 		pub fn set(origin: OriginFor<T>, #[pallet::compact] now: T::Moment) -> DispatchResult {
 			ensure_none(origin)?;
 			assert!(!DidUpdate::<T>::exists(), "Timestamp must be updated only once in the block");
+			let manual = Self::manual();
 			let prev = Self::now();
-			assert!(
-				prev.is_zero() || now >= prev + T::MinimumPeriod::get(),
-				"Timestamp must increment by at least <MinimumPeriod> between sequential blocks"
-			);
-			Now::<T>::put(now);
+			if !manual {
+				assert!(
+					prev.is_zero() || now >= prev + T::MinimumPeriod::get(),
+					"Timestamp must increment by at least <MinimumPeriod> between sequential blocks"
+				);
+				Now::<T>::put(now);
+			}
 			DidUpdate::<T>::put(true);
 
-			<T::OnTimestampSet as OnTimestampSet<_>>::on_timestamp_set(now);
+			if manual {
+				<T::OnTimestampSet as OnTimestampSet<_>>::on_timestamp_set(prev);
+			} else {
+				<T::OnTimestampSet as OnTimestampSet<_>>::on_timestamp_set(now);
+			}
 
 			Ok(())
 		}
@@ -317,7 +347,7 @@ pub mod pallet {
 		}
 	}
 }
-
+#[pallet::call(weight(<T as Config>::WeightInfo))]
 impl<T: Config> Pallet<T> {
 	/// Get the current time for the current block.
 	///
@@ -327,18 +357,24 @@ impl<T: Config> Pallet<T> {
 		Self::now()
 	}
 
+	#[pallet::call_index(0)]
+	pub fn set_manual(origin: OriginFor<T>, set: T::bool) -> DispatchResult {
+		Manual::<T>::put(set);
+		Ok(())
+	}
+
+	#[pallet::call_index(1)]
+	pub fn set_now(origin: OriginFor<T>, now: T::Moment) -> DispatchResult {
+		Now::<T>::put(now);
+		Ok(())
+	}
+
 	/// Set the timestamp to something in particular. Only used for tests.
-	// #[cfg(any(feature = "runtime-benchmarks", feature = "std"))]
+	#[cfg(any(feature = "runtime-benchmarks", feature = "std"))]
 	pub fn set_timestamp(now: T::Moment) {
 		Now::<T>::put(now);
 		DidUpdate::<T>::put(true);
 		<T::OnTimestampSet as OnTimestampSet<_>>::on_timestamp_set(now);
-	}
-
-	/// Set the timestamp to something in particular. Only used for tests.
-	// #[cfg(any(feature = "runtime-benchmarks", feature = "std"))]
-	pub fn set_timestamp_no_update(now: T::Moment) {
-		Now::<T>::put(now);
 	}
 }
 
@@ -367,7 +403,6 @@ impl<T: Config> UnixTime for Pallet<T> {
 				);
 			}
 		}
-		//core::time::Duration::from_millis(now.saturated_into::<u64>())
-		core::time::Duration::from_millis(T::Moment::zero().saturated_into::<u64>())
+		core::time::Duration::from_millis(now.saturated_into::<u64>())
 	}
 }
