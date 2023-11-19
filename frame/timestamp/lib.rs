@@ -219,6 +219,7 @@ pub mod pallet {
 		#[pallet::call_index(1)]
 		#[pallet::weight((
 			T::WeightInfo::set(),
+			DispatchClass::Mandatory
 		))]
 		pub fn set_time(origin: OriginFor<T>, #[pallet::compact] now: T::Moment) -> DispatchResult {
 			Now::<T>::put(now);
