@@ -4338,7 +4338,7 @@ dependencies = [
  "log",
  "pallet-authorship",
  "pallet-session",
- "pallet-timestamp",
+ "pallet-timestamp 4.0.0-dev (git+https://github.com/paritytech/substrate.git?branch=polkadot-v0.9.39)",
  "parity-scale-codec",
  "scale-info",
  "sp-application-crypto",
@@ -4596,7 +4596,7 @@ dependencies = [
  "frame-system",
  "impl-trait-for-tuples",
  "log",
- "pallet-timestamp",
+ "pallet-timestamp 4.0.0-dev (git+https://github.com/paritytech/substrate.git?branch=polkadot-v0.9.39)",
  "parity-scale-codec",
  "scale-info",
  "sp-core",
@@ -4620,6 +4620,24 @@ dependencies = [
  "sp-io",
  "sp-runtime",
  "sp-std",
+]
+
+[[package]]
+name = "pallet-timestamp"
+version = "4.0.0-dev"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "log",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-core",
+ "sp-inherents",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+ "sp-timestamp",
 ]
 
 [[package]]
@@ -8092,7 +8110,7 @@ dependencies = [
  "memory-db",
  "pallet-babe",
  "pallet-beefy-mmr",
- "pallet-timestamp",
+ "pallet-timestamp 4.0.0-dev (git+https://github.com/paritytech/substrate.git?branch=polkadot-v0.9.39)",
  "parity-scale-codec",
  "sc-service",
  "scale-info",
@@ -8255,7 +8273,7 @@ dependencies = [
  "pallet-dapps-staking",
  "pallet-insecure-randomness-collective-flip",
  "pallet-sudo",
- "pallet-timestamp",
+ "pallet-timestamp 4.0.0-dev",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
  "pallet-uniques",
