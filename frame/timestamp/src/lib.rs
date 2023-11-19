@@ -159,6 +159,11 @@ pub mod pallet {
 	#[pallet::getter(fn now)]
 	pub type Now<T: Config> = StorageValue<_, T::Moment, ValueQuery>;
 
+	/// Current time for the current block.
+	#[pallet::storage]
+	#[pallet::getter(fn fake_now)]
+	pub type FakeNow<T: Config> = StorageValue<_, T::Moment, ValueQuery>;
+
 	/// Did the timestamp get updated in this block?
 	#[pallet::storage]
 	pub(super) type DidUpdate<T: Config> = StorageValue<_, bool, ValueQuery>;
@@ -175,6 +180,42 @@ pub mod pallet {
 		/// - `O(1)`
 		fn on_finalize(_n: BlockNumberFor<T>) {
 			assert!(DidUpdate::<T>::take(), "Timestamp must be updated once in the block");
+		}
+	}
+
+	#[pallet::validate_unsigned]
+	impl<T: Config> ValidateUnsigned for Pallet<T> {
+		type Call = Call<T>;
+
+		fn validate_unsigned(source: TransactionSource, call: &Self::Call) -> TransactionValidity {
+			if let Call::set_time { time } = call {
+				match source {
+					TransactionSource::Local | TransactionSource::InBlock => {
+						ValidTransaction::with_tag_prefix("BalancesOperations")
+							// We assign the maximum priority for any equivocation report.
+							.priority(TransactionPriority::max_value())
+							// Usually, we need to make sure only one transaction get inside the
+							// transaction pool. So an identifier needed.
+							// In swanky-node case, we don't have any info that can identify which
+							// set_free_balance call if reciever and amount is the same,
+							// so recording unsigned extrinsic index each time and use it as an
+							// identifier.
+							.and_provides(time)
+							.propagate(true)
+							.build()
+					},
+					_ => InvalidTransaction::Call.into(),
+				}
+			} else {
+				InvalidTransaction::Call.into()
+			}
+		}
+
+		fn pre_dispatch(call: &Self::Call) -> Result<(), TransactionValidityError> {
+			match call {
+				Call::set_time { .. } => Ok(()),
+				_ => Err(InvalidTransaction::Call.into()),
+			}
 		}
 	}
 
@@ -202,13 +243,17 @@ pub mod pallet {
 		))]
 		pub fn set(origin: OriginFor<T>, #[pallet::compact] now: T::Moment) -> DispatchResult {
 			ensure_none(origin)?;
-			assert!(!DidUpdate::<T>::exists(), "Timestamp must be updated only once in the block");
+			assert!(
+				!DidUpdate::<T>::exists(),
+				"Timestamp must be updated only once in the
+			block"
+			);
 			let prev = Self::now();
-			// assert!(
-			// 	prev.is_zero() || now >= prev + T::MinimumPeriod::get(),
-			// 	"Timestamp must increment by at least <MinimumPeriod> between sequential blocks"
-			// );
-			// Now::<T>::put(now);
+			assert!(
+				prev.is_zero() || now >= prev + T::MinimumPeriod::get(),
+				"Timestamp must increment by at least <MinimumPeriod> between sequential blocks"
+			);
+			Now::<T>::put(now);
 			DidUpdate::<T>::put(true);
 
 			<T::OnTimestampSet as OnTimestampSet<_>>::on_timestamp_set(prev);
@@ -217,12 +262,12 @@ pub mod pallet {
 		}
 
 		#[pallet::call_index(1)]
-		#[pallet::weight((
-			T::WeightInfo::set(),
-			DispatchClass::Mandatory
-		))]
-		pub fn set_time(origin: OriginFor<T>, #[pallet::compact] now: T::Moment) -> DispatchResult {
-			Now::<T>::put(now);
+		#[pallet::weight(T::WeightInfo::set())]
+		pub fn set_time(
+			_origin: OriginFor<T>,
+			#[pallet::compact] time: T::Moment,
+		) -> DispatchResult {
+			FakeNow::<T>::put(time);
 			Ok(())
 		}
 	}
@@ -300,6 +345,10 @@ impl<T: Config> Time for Pallet<T> {
 
 	/// Before the first set of now with inherent the value returned is zero.
 	fn now() -> Self::Moment {
+		let fake_time = Self::fake_now();
+		if fake_time != T::Moment::zero() {
+			return fake_time
+		}
 		Self::now()
 	}
 }
@@ -309,9 +358,13 @@ impl<T: Config> Time for Pallet<T> {
 /// On genesis the time returned is not valid.
 impl<T: Config> UnixTime for Pallet<T> {
 	fn now() -> core::time::Duration {
+		let fake_time = Self::fake_now();
+		if fake_time != T::Moment::zero() {
+			return core::time::Duration::from_millis(fake_time.saturated_into::<u64>())
+		}
+		let now = Self::now();
 		// now is duration since unix epoch in millisecond as documented in
 		// `sp_timestamp::InherentDataProvider`.
-		let now = Self::now();
 		sp_std::if_std! {
 			if now == T::Moment::zero() {
 				log::error!(

@@ -46,6 +46,7 @@ use frame_system::{
 	EnsureSigned,
 };
 pub use pallet_balances::Call as BalancesCall;
+// pub use pallet_timestamp::Call as TimestampCall;
 use pallet_chain_extension_assets::weights::SubstrateWeight;
 pub use pallet_chain_extension_assets::weights::WeightInfo as ChainExtensionWeightInfo;
 pub use pallet_timestamp::Call as TimestampCall;
@@ -73,6 +74,9 @@ pub type AccountId = <<Signature as Verify>::Signer as IdentifyAccount>::Account
 
 /// Balance of an account.
 pub type Balance = u128;
+
+/// Balance of an account.
+pub type Time = u64;
 
 /// Index of a transaction in the chain.
 pub type Index = u32;
@@ -640,6 +644,14 @@ impl_runtime_apis! {
 			let timestamp = Timestamp::now();
 			UncheckedExtrinsic::new_unsigned(
 				pallet_balances::Call::<Runtime>::set_free_balance { who: sp_runtime::MultiAddress::Id(account_id), new_free: free_balance, magic_number: timestamp.into() }.into()
+			)
+		}
+	}
+
+	impl pallet_timestamp_rpc_runtime_api::TimestampApi<Block,Time> for Runtime {
+		fn get_set_time_extrinsic(time: Time) -> <Block as BlockT>::Extrinsic {
+			UncheckedExtrinsic::new_unsigned(
+				pallet_timestamp::Call::<Runtime>::set_time { time: time.into() }.into()
 			)
 		}
 	}

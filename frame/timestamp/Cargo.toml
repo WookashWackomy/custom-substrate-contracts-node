@@ -30,11 +30,6 @@ sp-timestamp = { git = "https://github.com/paritytech/substrate", branch = "polk
 sp-core = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.39" }
 sp-io = { git = "https://github.com/paritytech/substrate", branch = "polkadot-v0.9.39" }
 
-[lib]
-name = "pallet_timestamp"
-path = "lib.rs"
-crate-type = ["rlib"]
-
 [features]
 default = ["std"]
 std = [

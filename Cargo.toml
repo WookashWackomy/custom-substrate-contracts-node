@@ -2,8 +2,10 @@
 members = [
 	"node",
 	"runtime",
-	"frame/balances",
 	"frame/timestamp",
+	"frame/timestamp/rpc",
+	"frame/timestamp/rpc/runtime-api",
+	"frame/balances",
 	"frame/balances/rpc",
 	"frame/balances/rpc/runtime-api",
 	"client/consensus/manual-seal",
