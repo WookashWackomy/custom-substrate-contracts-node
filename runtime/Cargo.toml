@@ -24,7 +24,7 @@ pallet-assets = { default-features = false, git = "https://github.com/paritytech
 pallet-balances = { path = "../frame/balances", default-features = false }
 pallet-insecure-randomness-collective-flip = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
 pallet-sudo = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
-pallet-timestamp = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
+pallet-timestamp = { path = "../frame/timestamp", default-features = false }
 pallet-transaction-payment = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
 pallet-uniques = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
 pallet-utility = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
@@ -53,6 +53,7 @@ pallet-chain-extension-assets = { git = "https://github.com/AstarNetwork/astar-f
 # Used for the node template's RPCs
 frame-system-rpc-runtime-api = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
 pallet-balances-rpc-runtime-api = { path = "../frame/balances/rpc/runtime-api", default-features = false }
+pallet-timestamp-rpc-runtime-api = { path = "../frame/timestamp/rpc/runtime-api", default-features = false }
 pallet-transaction-payment-rpc-runtime-api = { default-features = false, git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.39" }
 
 # Used for runtime benchmarking
@@ -85,6 +86,7 @@ std = [
 	"pallet-timestamp/std",
 	"pallet-transaction-payment-rpc-runtime-api/std",
 	"pallet-balances-rpc-runtime-api/std",
+	"pallet-timestamp-rpc-runtime-api/std",
 	"pallet-transaction-payment/std",
 	"pallet-utility/std",
 	"sp-api/std",
@@ -107,7 +109,6 @@ runtime-benchmarks = [
 	"hex-literal",
 	"pallet-balances/runtime-benchmarks",
 	"pallet-dapps-staking/runtime-benchmarks",
-	"pallet-timestamp/runtime-benchmarks",
 	"sp-runtime/runtime-benchmarks",
 	"pallet-contracts/runtime-benchmarks",
 	"pallet-assets/runtime-benchmarks",
@@ -119,10 +120,10 @@ try-runtime = [
 	"frame-try-runtime",
 	"frame-system/try-runtime",
 	"pallet-balances/try-runtime",
+	"pallet-timestamp/try-runtime",
 	"pallet-insecure-randomness-collective-flip/try-runtime",
 	"pallet-dapps-staking/try-runtime",
 	"pallet-sudo/try-runtime",
-	"pallet-timestamp/try-runtime",
 	"pallet-transaction-payment/try-runtime",
 	"pallet-assets/try-runtime",
 	"pallet-contracts/try-runtime",

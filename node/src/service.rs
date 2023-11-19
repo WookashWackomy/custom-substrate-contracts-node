@@ -218,12 +218,24 @@ pub fn new_full(
 
 	let commands_stream = stream::select(rpc_commands_stream, pool_import_commands_stream);
 
-	let params = sc_consensus_manual_seal::ManualSealParams {
+	// let params = sc_consensus_manual_seal::ManualSealParams {
+	// 	block_import: client.clone(),
+	// 	env: proposer,
+	// 	client: client.clone(),
+	// 	pool: transaction_pool,
+	// 	commands_stream,
+	// 	select_chain,
+	// 	consensus_data_provider: None,
+	// 	create_inherent_data_providers: move |_, ()| async move {
+	// 		Ok(sp_timestamp::InherentDataProvider::from_system_time())
+	// 	},
+	// };
+
+	let params = sc_consensus_manual_seal::InstantSealParams {
 		block_import: client.clone(),
 		env: proposer,
 		client: client.clone(),
 		pool: transaction_pool,
-		commands_stream,
 		select_chain,
 		consensus_data_provider: None,
 		create_inherent_data_providers: move |_, ()| async move {
@@ -232,24 +244,10 @@ pub fn new_full(
 	};
 
 	task_manager.spawn_essential_handle().spawn_blocking(
-		"instant-and-manual-seal",
+		"instant-seal",
 		None,
-		sc_consensus_manual_seal::run_manual_seal(params),
+		sc_consensus_manual_seal::run_instant_seal(params),
 	);
-
-	if let Some(sec) = finalize_delay_sec {
-		let delayed_finalize_params = sc_consensus_manual_seal::DelayedFinalizeParams {
-			client,
-			spawn_handle: task_manager.spawn_handle(),
-			delay_sec: sec,
-		};
-
-		task_manager.spawn_essential_handle().spawn_blocking(
-			"delayed_finalize",
-			None,
-			sc_consensus_manual_seal::run_delayed_finalize(delayed_finalize_params),
-		);
-	}
 
 	network_starter.start_network();
 	Ok(task_manager)

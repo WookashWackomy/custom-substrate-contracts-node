@@ -4338,7 +4338,7 @@ dependencies = [
  "log",
  "pallet-authorship",
  "pallet-session",
- "pallet-timestamp",
+ "pallet-timestamp 4.0.0-dev (git+https://github.com/paritytech/substrate.git?branch=polkadot-v0.9.39)",
  "parity-scale-codec",
  "scale-info",
  "sp-application-crypto",
@@ -4596,7 +4596,7 @@ dependencies = [
  "frame-system",
  "impl-trait-for-tuples",
  "log",
- "pallet-timestamp",
+ "pallet-timestamp 4.0.0-dev (git+https://github.com/paritytech/substrate.git?branch=polkadot-v0.9.39)",
  "parity-scale-codec",
  "scale-info",
  "sp-core",
@@ -4625,6 +4625,24 @@ dependencies = [
 [[package]]
 name = "pallet-timestamp"
 version = "4.0.0-dev"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "log",
+ "parity-scale-codec",
+ "scale-info",
+ "sp-core",
+ "sp-inherents",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+ "sp-timestamp",
+]
+
+[[package]]
+name = "pallet-timestamp"
+version = "4.0.0-dev"
 source = "git+https://github.com/paritytech/substrate.git?branch=polkadot-v0.9.39#8c4b84520cee2d7de53cc33cb67605ce4efefba8"
 dependencies = [
  "frame-benchmarking",
@@ -4638,6 +4656,38 @@ dependencies = [
  "sp-runtime",
  "sp-std",
  "sp-timestamp",
+]
+
+[[package]]
+name = "pallet-timestamp-rpc"
+version = "4.0.0-dev"
+dependencies = [
+ "futures",
+ "hex",
+ "jsonrpsee",
+ "node-primitives",
+ "pallet-timestamp 4.0.0-dev",
+ "pallet-timestamp-rpc-runtime-api",
+ "parity-scale-codec",
+ "sc-transaction-pool-api",
+ "sp-api",
+ "sp-blockchain",
+ "sp-core",
+ "sp-rpc",
+ "sp-runtime",
+ "sp-weights",
+ "swanky-runtime",
+]
+
+[[package]]
+name = "pallet-timestamp-rpc-runtime-api"
+version = "4.0.0-dev"
+dependencies = [
+ "pallet-timestamp 4.0.0-dev",
+ "parity-scale-codec",
+ "sp-api",
+ "sp-runtime",
+ "sp-weights",
 ]
 
 [[package]]
@@ -8092,7 +8142,7 @@ dependencies = [
  "memory-db",
  "pallet-babe",
  "pallet-beefy-mmr",
- "pallet-timestamp",
+ "pallet-timestamp 4.0.0-dev (git+https://github.com/paritytech/substrate.git?branch=polkadot-v0.9.39)",
  "parity-scale-codec",
  "sc-service",
  "scale-info",
@@ -8201,6 +8251,7 @@ dependencies = [
  "jsonrpsee",
  "log",
  "pallet-balances-rpc",
+ "pallet-timestamp-rpc",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc",
  "sc-basic-authorship",
@@ -8255,7 +8306,8 @@ dependencies = [
  "pallet-dapps-staking",
  "pallet-insecure-randomness-collective-flip",
  "pallet-sudo",
- "pallet-timestamp",
+ "pallet-timestamp 4.0.0-dev",
+ "pallet-timestamp-rpc-runtime-api",
  "pallet-transaction-payment",
  "pallet-transaction-payment-rpc-runtime-api",
  "pallet-uniques",
