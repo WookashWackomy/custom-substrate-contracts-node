@@ -28,6 +28,8 @@ pub struct FullDeps<C, P> {
 	pub deny_unsafe: DenyUnsafe,
 }
 
+pub type Time = u64;
+
 /// Instantiate all full RPC extensions.
 pub fn create_full<C, P>(
 	deps: FullDeps<C, P>,
@@ -40,8 +42,11 @@ where
 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
 	C::Api: BlockBuilder<Block>,
+	C::Api: pallet_timestamp_rpc::TimestampRuntimeApi<Block, Time>,
+	C: HeaderBackend<<P as sc_service::TransactionPool>::Block>,
 	P: TransactionPool + 'static,
 {
+	use pallet_timestamp_rpc::{Timestamp, TimestampApiServer};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApiServer};
 	use substrate_frame_rpc_system::{System, SystemApiServer};
 
@@ -57,6 +62,7 @@ where
 	// `module.merge(YourRpcTrait::into_rpc(YourRpcStruct::new(ReferenceToClient, ...)))?;`
 
 	// Dev RPC API extension
+	module.merge(Timestamp::new(client.clone(), pool.clone()).into_rpc())?;
 	module.merge(Dev::new(client, deny_unsafe).into_rpc())?;
 
 	Ok(module)
