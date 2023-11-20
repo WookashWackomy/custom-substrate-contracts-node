@@ -183,41 +183,41 @@ pub mod pallet {
 		}
 	}
 
-	#[pallet::validate_unsigned]
-	impl<T: Config> ValidateUnsigned for Pallet<T> {
-		type Call = Call<T>;
+	// #[pallet::validate_unsigned]
+	// impl<T: Config> ValidateUnsigned for Pallet<T> {
+	// 	type Call = Call<T>;
 
-		fn validate_unsigned(source: TransactionSource, call: &Self::Call) -> TransactionValidity {
-			if let Call::set_time { time } = call {
-				match source {
-					TransactionSource::Local | TransactionSource::InBlock => {
-						ValidTransaction::with_tag_prefix("BalancesOperations")
-							// We assign the maximum priority for any equivocation report.
-							.priority(TransactionPriority::max_value())
-							// Usually, we need to make sure only one transaction get inside the
-							// transaction pool. So an identifier needed.
-							// In swanky-node case, we don't have any info that can identify which
-							// set_free_balance call if reciever and amount is the same,
-							// so recording unsigned extrinsic index each time and use it as an
-							// identifier.
-							.and_provides(time)
-							.propagate(true)
-							.build()
-					},
-					_ => InvalidTransaction::Call.into(),
-				}
-			} else {
-				InvalidTransaction::Call.into()
-			}
-		}
+	// 	fn validate_unsigned(source: TransactionSource, call: &Self::Call) -> TransactionValidity {
+	// 		if let Call::set_time { time } = call {
+	// 			match source {
+	// 				TransactionSource::Local | TransactionSource::InBlock => {
+	// 					ValidTransaction::with_tag_prefix("BalancesOperations")
+	// 						// We assign the maximum priority for any equivocation report.
+	// 						.priority(TransactionPriority::max_value())
+	// 						// Usually, we need to make sure only one transaction get inside the
+	// 						// transaction pool. So an identifier needed.
+	// 						// In swanky-node case, we don't have any info that can identify which
+	// 						// set_free_balance call if reciever and amount is the same,
+	// 						// so recording unsigned extrinsic index each time and use it as an
+	// 						// identifier.
+	// 						.and_provides(time)
+	// 						.propagate(true)
+	// 						.build()
+	// 				},
+	// 				_ => InvalidTransaction::Call.into(),
+	// 			}
+	// 		} else {
+	// 			InvalidTransaction::Call.into()
+	// 		}
+	// 	}
 
-		fn pre_dispatch(call: &Self::Call) -> Result<(), TransactionValidityError> {
-			match call {
-				Call::set_time { .. } => Ok(()),
-				_ => Err(InvalidTransaction::Call.into()),
-			}
-		}
-	}
+	// 	fn pre_dispatch(call: &Self::Call) -> Result<(), TransactionValidityError> {
+	// 		match call {
+	// 			Call::set_time { .. } => Ok(()),
+	// 			_ => Err(InvalidTransaction::Call.into()),
+	// 		}
+	// 	}
+	// }
 
 	#[pallet::call]
 	impl<T: Config> Pallet<T> {
@@ -243,10 +243,19 @@ pub mod pallet {
 		))]
 		pub fn set(origin: OriginFor<T>, #[pallet::compact] now: T::Moment) -> DispatchResult {
 			ensure_none(origin)?;
+			let fake_time = Self::fake_now();
+			if fake_time != T::Moment::zero() {
+				Now::<T>::put(fake_time);
+				DidUpdate::<T>::put(true);
+
+				<T::OnTimestampSet as OnTimestampSet<_>>::on_timestamp_set(fake_time);
+
+				return Ok(())
+			}
 			assert!(
 				!DidUpdate::<T>::exists(),
 				"Timestamp must be updated only once in the
-			block"
+				block"
 			);
 			let prev = Self::now();
 			assert!(
@@ -256,7 +265,7 @@ pub mod pallet {
 			Now::<T>::put(now);
 			DidUpdate::<T>::put(true);
 
-			<T::OnTimestampSet as OnTimestampSet<_>>::on_timestamp_set(prev);
+			<T::OnTimestampSet as OnTimestampSet<_>>::on_timestamp_set(now);
 
 			Ok(())
 		}
@@ -328,6 +337,10 @@ impl<T: Config> Pallet<T> {
 	/// NOTE: if this function is called prior to setting the timestamp,
 	/// it will return the timestamp of the previous block.
 	pub fn get() -> T::Moment {
+		let fake_time = Self::fake_now();
+		if fake_time != T::Moment::zero() {
+			return fake_time
+		}
 		Self::now()
 	}
 
