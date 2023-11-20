@@ -45,7 +45,7 @@ sp-block-builder = { git = "https://github.com/paritytech/substrate", package = 
 sc-basic-authorship = { git = "https://github.com/paritytech/substrate", package = "sc-basic-authorship", branch = "polkadot-v0.9.43" }
 substrate-frame-rpc-system = { git = "https://github.com/paritytech/substrate", package = "substrate-frame-rpc-system", branch = "polkadot-v0.9.43" }
 pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/substrate", package = "pallet-transaction-payment-rpc", branch = "polkadot-v0.9.43" }
-
+pallet-timestamp-rpc = { path = "../frame/timestamp/rpc" }
 # Local Dependencies
 contracts-node-runtime = { path = "../runtime" }
 
