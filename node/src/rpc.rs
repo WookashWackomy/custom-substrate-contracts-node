@@ -15,6 +15,7 @@ use sc_transaction_pool_api::TransactionPool;
 use sp_api::ProvideRuntimeApi;
 use sp_block_builder::BlockBuilder;
 use sp_blockchain::{Error as BlockChainError, HeaderBackend, HeaderMetadata};
+use sp_runtime::traits::Block as BlockT;
 
 pub use sc_rpc_api::DenyUnsafe;
 
@@ -41,19 +42,19 @@ where
 	C: Send + Sync + 'static,
 	C::Api: substrate_frame_rpc_system::AccountNonceApi<Block, AccountId, Index>,
 	C::Api: pallet_transaction_payment_rpc::TransactionPaymentRuntimeApi<Block, Balance>,
-	C::Api: BlockBuilder<Block>,
 	C::Api: pallet_timestamp_rpc::TimestampRuntimeApi<Block, Time>,
+	C::Api: BlockBuilder<Block>,
 	C: HeaderBackend<<P as sc_service::TransactionPool>::Block>,
-	P: TransactionPool + 'static,
+	P: TransactionPool<Block = Block, Hash = <Block as BlockT>::Hash> + 'static,
 {
-	use pallet_timestamp_rpc::{Timestamp, TimestampApiServer};
+	use pallet_timestamp_rpc::{TimestampApiServer, TimestampRPC};
 	use pallet_transaction_payment_rpc::{TransactionPayment, TransactionPaymentApiServer};
 	use substrate_frame_rpc_system::{System, SystemApiServer};
 
 	let mut module = RpcModule::new(());
 	let FullDeps { client, pool, deny_unsafe } = deps;
 
-	module.merge(System::new(client.clone(), pool, deny_unsafe).into_rpc())?;
+	module.merge(System::new(client.clone(), pool.clone(), deny_unsafe).into_rpc())?;
 	module.merge(TransactionPayment::new(client.clone()).into_rpc())?;
 
 	// Extend this RPC with a custom API by using the following syntax.
@@ -62,7 +63,7 @@ where
 	// `module.merge(YourRpcTrait::into_rpc(YourRpcStruct::new(ReferenceToClient, ...)))?;`
 
 	// Dev RPC API extension
-	module.merge(Timestamp::new(client.clone(), pool.clone()).into_rpc())?;
+	module.merge(TimestampRPC::new(client.clone(), pool.clone()).into_rpc())?;
 	module.merge(Dev::new(client, deny_unsafe).into_rpc())?;
 
 	Ok(module)

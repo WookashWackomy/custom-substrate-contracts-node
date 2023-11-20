@@ -27,21 +27,6 @@ pub trait TimestampApi<BlockHash, Time> {
 	async fn set_time(&self, time: Time) -> RpcResult<()>;
 }
 
-/// Provides RPC methods to query a dispatchable's class, weight and fee.
-pub struct Timestamp<C, P: TransactionPool> {
-	/// Shared reference to the client.
-	client: Arc<C>,
-	/// Shared reference to the transaction pool.
-	pool: Arc<P>,
-}
-
-impl<C, P: TransactionPool> Timestamp<C, P> {
-	/// Creates a new instance of the TransactionPayment Rpc helper.
-	pub fn new(client: Arc<C>, pool: Arc<P>) -> Self {
-		Self { client, pool }
-	}
-}
-
 /// Error type of this RPC api.
 pub enum Error {
 	/// The transaction was not decodable.
@@ -59,12 +44,26 @@ impl From<Error> for i32 {
 	}
 }
 
+/// Provides RPC methods to query a dispatchable's class, weight and fee.
+pub struct TimestampRPC<C, P> {
+	/// Shared reference to the client.
+	client: Arc<C>,
+	/// Shared reference to the transaction pool.
+	pool: Arc<P>,
+}
+
+impl<C, P> TimestampRPC<C, P> {
+	/// Creates a new instance of the TransactionPayment Rpc helper.
+	pub fn new(client: Arc<C>, pool: Arc<P>) -> Self {
+		Self { client, pool }
+	}
+}
+
 #[async_trait]
 impl<Client, Pool, Time> TimestampApiServer<<Pool::Block as BlockT>::Hash, Time>
-	for Timestamp<Client, Pool>
+	for TimestampRPC<Client, Pool>
 where
-	Client:
-		Send + Sync + sp_api::ProvideRuntimeApi<Pool::Block> + 'static + HeaderBackend<Pool::Block>,
+	Client: Send + Sync + 'static + ProvideRuntimeApi<Pool::Block> + HeaderBackend<Pool::Block>,
 	Client::Api: TimestampRuntimeApi<Pool::Block, Time>,
 	Pool: TransactionPool + 'static,
 	Time: Codec + MaybeDisplay + Copy + TryInto<u64> + Send + Sync + 'static,
