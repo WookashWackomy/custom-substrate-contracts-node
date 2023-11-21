@@ -1,0 +1,97 @@
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+    Blocking waiting for file lock on package cache
+⚡ Found 3 strongly connected components which includes at least one cycle each
+cycle(001) ∈ α: DisputeCoordinator ~~{"DisputeDistributionMessage"}~~> DisputeDistribution ~~{"DisputeCoordinatorMessage"}~~>  *
+cycle(002) ∈ β: CandidateBacking ~~{"CollatorProtocolMessage"}~~> CollatorProtocol ~~{"CandidateBackingMessage"}~~>  *
+cycle(003) ∈ γ: NetworkBridgeRx ~~{"GossipSupportMessage"}~~> GossipSupport ~~{"NetworkBridgeRxMessage"}~~>  *
+   Compiling cumulus-primitives-parachain-inherent v0.3.0
+   Compiling polkadot-network-bridge v3.0.0
+   Compiling rococo-runtime-constants v3.0.0
+   Compiling polkadot-collator-protocol v3.0.0
+   Compiling polkadot-node-collation-generation v3.0.0
+   Compiling polkadot-availability-recovery v3.0.0
+   Compiling polkadot-node-core-candidate-validation v3.0.0
+   Compiling polkadot-availability-bitfield-distribution v3.0.0
+   Compiling polkadot-node-core-provisioner v3.0.0
+   Compiling polkadot-dispute-distribution v3.0.0
+   Compiling polkadot-node-core-approval-voting v3.0.0
+   Compiling polkadot-approval-distribution v3.0.0
+   Compiling polkadot-node-core-dispute-coordinator v3.0.0
+   Compiling polkadot-node-core-prospective-parachains v2.0.0
+   Compiling polkadot-node-core-bitfield-signing v3.0.0
+   Compiling rococo-runtime v3.0.0
+   Compiling polkadot-statement-distribution v3.0.0
+   Compiling polkadot-node-core-chain-selection v3.0.0
+   Compiling polkadot-gossip-support v3.0.0
+   Compiling polkadot-node-core-backing v3.0.0
+   Compiling polkadot-node-core-av-store v3.0.0
+   Compiling polkadot-availability-distribution v3.0.0
+   Compiling polkadot-node-core-pvf-checker v3.0.0
+   Compiling polkadot-node-core-parachains-inherent v3.0.0
+   Compiling polkadot-node-core-chain-api v3.0.0
+   Compiling cumulus-client-pov-recovery v0.3.0
+   Compiling pallet-timestamp v4.0.0-dev (/home/lukas/repos/abax/substrate-contracts-node-priv/frame/timestamp)
+   Compiling cumulus-client-network v0.3.0
+   Compiling cumulus-pallet-parachain-system v0.3.1
+   Compiling pallet-timestamp-rpc-runtime-api v4.0.0-dev (/home/lukas/repos/abax/substrate-contracts-node-priv/frame/timestamp/rpc/runtime-api)
+   Compiling contracts-node-runtime v0.35.0 (/home/lukas/repos/abax/substrate-contracts-node-priv/runtime)
+   Compiling cumulus-relay-chain-rpc-interface v0.3.0
+   Compiling cumulus-client-consensus-common v0.3.0
+   Compiling contracts-parachain-runtime v0.35.0 (/home/lukas/repos/abax/substrate-contracts-node-priv/parachain-runtime)
+   Compiling cumulus-pallet-aura-ext v0.3.0
+   Compiling cumulus-client-collator v0.3.0
+   Compiling cumulus-client-consensus-proposer v0.3.0
+   Compiling cumulus-primitives-utility v0.3.0
+   Compiling cumulus-pallet-xcmp-queue v0.3.0
+   Compiling polkadot-service v3.0.0
+   Compiling cumulus-client-consensus-aura v0.3.0
+   Compiling cumulus-relay-chain-minimal-node v0.3.0
+error: failed to run custom build command for `contracts-parachain-runtime v0.35.0 (/home/lukas/repos/abax/substrate-contracts-node-priv/parachain-runtime)`
+
+Caused by:
+  process didn't exit successfully: `/home/lukas/repos/abax/substrate-contracts-node-priv/target/release/build/contracts-parachain-runtime-c2b5cba5ef2573ce/build-script-build` (exit status: 1)
+  --- stdout
+  Information that should be included in a bug report.
+  Executing build command: env -u CARGO_ENCODED_RUSTFLAGS -u CARGO_TARGET_DIR RUSTFLAGS="-C target-cpu=mvp -C target-feature=-sign-ext -C link-arg=--export-table -Clink-arg=--export=__heap_base -C link-arg=--import-memory  " SKIP_WASM_BUILD="" "/home/lukas/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/cargo" "rustc" "--target=wasm32-unknown-unknown" "--manifest-path=/home/lukas/repos/abax/substrate-contracts-node-priv/target/release/wbuild/contracts-parachain-runtime/Cargo.toml" "--color=always" "--profile" "release"
+  Using rustc version: rustc 1.74.0 (79e9716c9 2023-11-13)
+
+
+  --- stderr
+      Blocking waiting for file lock on package cache
+      Blocking waiting for file lock on package cache
+      Blocking waiting for file lock on package cache
+      Blocking waiting for file lock on package cache
+     Compiling pallet-timestamp v4.0.0-dev (/home/lukas/repos/abax/substrate-contracts-node-priv/frame/timestamp)
+     Compiling contracts-parachain-runtime v0.35.0 (/home/lukas/repos/abax/substrate-contracts-node-priv/parachain-runtime)
+  error[E0277]: the trait bound `Runtime: pallet_timestamp::pallet::Config` is not satisfied
+     --> /home/lukas/repos/abax/substrate-contracts-node-priv/parachain-runtime/src/lib.rs:406:42
+      |
+  406 | impl cumulus_pallet_aura_ext::Config for Runtime {}
+      |                                          ^^^^^^^ the trait `pallet_timestamp::pallet::Config` is not implemented for `Runtime`
+      |
+      = help: the trait `pallet_aura::Config` is implemented for `Runtime`
+      = note: required for `Runtime` to implement `pallet_aura::Config`
+  note: required by a bound in `cumulus_pallet_aura_ext::Config`
+     --> /home/lukas/.cargo/registry/src/index.crates.io-6f17d22bba15001f/cumulus-pallet-aura-ext-0.3.0/src/lib.rs:57:20
+      |
+  57  |     pub trait Config: pallet_aura::Config + frame_system::Config {}
+      |                       ^^^^^^^^^^^^^^^^^^^ required by this bound in `Config`
+
+  error[E0277]: the trait bound `Runtime: pallet_timestamp::pallet::Config` is not satisfied
+     --> /home/lukas/repos/abax/substrate-contracts-node-priv/parachain-runtime/src/lib.rs:445:30
+      |
+  445 | impl pallet_aura::Config for Runtime {
+      |                              ^^^^^^^ the trait `pallet_timestamp::pallet::Config` is not implemented for `Runtime`
+      |
+  note: required by a bound in `pallet_aura::Config`
+     --> /home/lukas/.cargo/registry/src/index.crates.io-6f17d22bba15001f/pallet-aura-23.0.0/src/lib.rs:87:20
+      |
+  87  |     pub trait Config: pallet_timestamp::Config + frame_system::Config {
+      |                       ^^^^^^^^^^^^^^^^^^^^^^^^ required by this bound in `Config`
+      = note: `Config` is a "sealed trait", because to implement it you also need to implement `pallet_timestamp::pallet::Config`, which is not accessible; this is usually done to force you to use one of the provided types that already implement it
+
+  For more information about this error, try `rustc --explain E0277`.
+  error: could not compile `contracts-parachain-runtime` (lib) due to 2 previous errors
+warning: build failed, waiting for other jobs to finish...

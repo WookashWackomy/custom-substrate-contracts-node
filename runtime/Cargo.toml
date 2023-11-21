@@ -52,6 +52,8 @@ pallet-assets = { workspace = true }
 # Used for the node template's RPCs
 frame-system-rpc-runtime-api = { workspace = true }
 pallet-transaction-payment-rpc-runtime-api = { workspace = true }
+pallet-timestamp-rpc-runtime-api = { workspace = true }
+
 
 # Used for runtime benchmarking
 frame-benchmarking = { workspace = true, optional = true }

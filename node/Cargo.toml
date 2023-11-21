@@ -25,8 +25,9 @@ jsonrpsee = { workspace = true }
 futures = { workspace = true }
 
 # Local
-contracts-parachain-runtime = { path = "../parachain-runtime" }
+# contracts-parachain-runtime = { path = "../parachain-runtime" }
 contracts-node-runtime = { path = "../runtime" }
+pallet-timestamp-rpc = { path = "../frame/timestamp/rpc" }
 
 # Substrate
 frame-benchmarking = { workspace = true }
@@ -90,10 +91,10 @@ substrate-build-script-utils = { workspace = true }
 [features]
 default = []
 runtime-benchmarks = [
-	"contracts-parachain-runtime/runtime-benchmarks",
+	# "contracts-parachain-runtime/runtime-benchmarks",
 	"polkadot-cli/runtime-benchmarks",
 ]
 try-runtime = [
 	"try-runtime-cli/try-runtime",
-	"contracts-parachain-runtime/try-runtime"
+	# "contracts-parachain-runtime/try-runtime"
 ]

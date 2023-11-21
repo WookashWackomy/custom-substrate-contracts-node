@@ -11,7 +11,8 @@ resolver = "2"
 members = [
 	"node",
 	"runtime",
-	"parachain-runtime",
+	# "parachain-runtime",
+	'frame/timestamp'
 ]
 
 [profile.release]
@@ -19,9 +20,10 @@ panic = 'unwind'
 
 [workspace.dependencies]
 clap = { version = "4.4.6", features = ["derive"] }
-codec = { package = "parity-scale-codec", version = "3.6.5", default-features = false, features = ["derive"] }
+codec = { package = "parity-scale-codec", version = "3.6.5", default-features = false, features = ["derive", "max-encoded-len"] }
 futures = "0.3.28"
 hex-literal = { version = "0.4.1"}
+hex = { version = "0.4.3", default-features = false}
 jsonrpsee = { version = "0.16.2", features = ["server"] }
 log = { version = "0.4.20", default-features = false }
 serde = { version = "1.0.189", features = ["derive"] }
@@ -43,10 +45,11 @@ pallet-authorship = { version = "24.0.0", default-features = false }
 pallet-balances = { version = "24.0.0", default-features = false }
 pallet-session = { version = "24.0.0", default-features = false }
 pallet-sudo = { version = "24.0.0", default-features = false }
-pallet-timestamp = { version = "23.0.0", default-features = false }
+pallet-timestamp = { path = "./frame/timestamp", default-features = false }
 pallet-transaction-payment = { version = "24.0.0", default-features = false }
 pallet-transaction-payment-rpc = { version = "26.0.0" }
 pallet-transaction-payment-rpc-runtime-api = { version = "24.0.0", default-features = false }
+pallet-timestamp-rpc-runtime-api = { path = "./frame/timestamp/rpc/runtime-api" , default-features = false}
 sc-basic-authorship = { version = "0.30.0" }
 sc-chain-spec = { version = "23.0.0" }
 sc-cli = { version = "0.32.0" }
@@ -75,9 +78,11 @@ sp-offchain = { version = "22.0.0", default-features = false }
 sp-runtime = { version = "27.0.0", default-features = false }
 sp-session = { version = "23.0.0", default-features = false }
 sp-std = { version = "11.0.0", default-features = false }
-sp-timestamp = { version = "22.0.0" }
+sp-timestamp = { version = "22.0.0", default-features = false }
 sp-transaction-pool = { version = "22.0.0", default-features = false }
 sp-version = { version = "25.0.0", default-features = false }
+sp-weights = {version = "24.0.0", default-features = false }
+sp-rpc = {version = "24.0.0", default-features = false }
 substrate-frame-rpc-system = { version = "24.0.0" }
 substrate-prometheus-endpoint = { version = "0.15.0" }
 substrate-wasm-builder = { version = "13.0.0" }

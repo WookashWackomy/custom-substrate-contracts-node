@@ -66,6 +66,8 @@ pub type Nonce = u32;
 /// A hash of some data used by the chain.
 pub type Hash = sp_core::H256;
 
+pub type Time = u64;
+
 /// Opaque types. These are used by the CLI to instantiate machinery that don't need to know
 /// the specifics of the runtime. They can then be made to be agnostic over specific formats
 /// of data like extrinsics, allowing for them to continue syncing the network through upgrades
@@ -412,6 +414,12 @@ impl_runtime_apis! {
 			encoded: Vec<u8>,
 		) -> Option<Vec<(Vec<u8>, KeyTypeId)>> {
 			opaque::SessionKeys::decode_into_raw_public_keys(&encoded)
+		}
+	}
+
+	impl pallet_timestamp_rpc_runtime_api::TimestampApi<Block,Time> for Runtime {
+		fn set_time( time: Time) {
+				pallet_timestamp::Call::<Runtime>::set_time {time: time.into() };
 		}
 	}
 
